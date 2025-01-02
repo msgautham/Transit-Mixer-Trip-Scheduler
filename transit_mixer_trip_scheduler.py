@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from io import BytesIO
+import io
 
 def calculate_trip_times(start_time, batch_qty, pour_time, travel_time, pump_interval, buffer_time, qty_per_trip, num_vehicles):
     trips = []
@@ -81,12 +81,12 @@ if st.button("Generate Schedule"):
         st.write("### Trip Schedule")
         st.dataframe(df)
 
-        # Export to Excel and provide download link
-        excel_file = BytesIO()
-        df.to_excel(excel_file, index=False)
-        excel_file.seek(0)  # Reset pointer to the beginning of the file
+        # Export to Excel
+        excel_file = io.BytesIO()  # Use in-memory buffer
+        df.to_excel(excel_file, index=False, engine='openpyxl')
+        excel_file.seek(0)  # Reset the buffer pointer
         st.success("Trip schedule exported successfully!")
-        st.download_button("Download Excel File", excel_file, "transit_mixer_trip_schedule.xlsx", "application/vnd.ms-excel")
+        st.download_button("Download Excel File", data=excel_file, file_name="transit_mixer_trip_schedule.xlsx", mime="application/vnd.ms-excel")
 
     else:
         st.error("Please ensure all inputs are valid!")
